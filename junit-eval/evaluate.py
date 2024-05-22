@@ -19,7 +19,8 @@ class JUnitEval():
                  java_compile_cmd=cfg.JAVA_COMPILE_CMD,
                  java_run_cmd=cfg.JAVA_RUN_CMD,
                  success_regex=cfg.SUCCESS_REGEX,
-                 failure_regex=cfg.FAILURE_REGEX):
+                 failure_regex=cfg.FAILURE_REGEX,
+                 output_cfg=cfg.OUTPUT):
         self.submissions_dir = submissions_dir
         self.class_name = class_name
         self.unit_tests_dir = unit_tests_dir
@@ -30,6 +31,7 @@ class JUnitEval():
         self.java_run_cmd = java_run_cmd
         self.success_regex = re.compile(success_regex)
         self.failure_regex = re.compile(failure_regex)
+        self.output_cfg = output_cfg
 
     @classmethod
     def from_config(cls, cfg):
@@ -43,7 +45,8 @@ class JUnitEval():
             java_compile_cmd=cfg.JAVA_COMPILE_CMD,
             java_run_cmd=cfg.JAVA_RUN_CMD,
             success_regex=cfg.SUCCESS_REGEX,
-            failure_regex=cfg.FAILURE_REGEX
+            failure_regex=cfg.FAILURE_REGEX,
+            output_cfg=cfg.OUTPUT
         )
 
     def compile_java_file(self, file_path, classpath):
@@ -83,12 +86,10 @@ class JUnitEval():
             # Compile the submission
             compile_success, compile_errors = self.compile_java_file(temp_submission_path, class_path)
 
-            # Prepare the report
-            report_lines = [f"Submission: {submission_name}\n"]
-
+            summary_lines = []
             if not compile_success:
-                report_lines.append("Submission Compilation Failed")
-                report_lines.append(compile_errors)
+                summary_lines.append("Submission Compilation Failed")
+                summary_lines.append(compile_errors)
             else:
                 # Copy all unit test files to the temporary directory
                 for test_file in os.listdir(self.unit_tests_dir):
@@ -96,17 +97,17 @@ class JUnitEval():
 
                 # Compile unit tests
                 test_files = sorted(f for f in os.listdir(self.unit_tests_dir) if 'Test' in f and f.endswith('.java')) # TODO: better naming scheme?
-                test_report_lines = []
+                test_detail_lines = []
                 successful_tests = 0
-                failed_tests_output = []
+                total_score = 0
                 for test_file in test_files:
                     test_path = osp.join(temp_dir, test_file)
                     success, compile_errors = self.compile_java_file(test_path, class_path)
-                    test_report_lines.append(f"\n---- Test: {test_file} ----\n")
+                    test_detail_lines.append(f"\n---- Test: {test_file} ----\n")
                     if not success:
-                        test_report_lines.append(f"Test {test_file} Compilation Failed")
-                        test_report_lines.append(compile_errors)
-                        report_lines.append(f"Test {test_file}: Compilation error")
+                        test_detail_lines.append(f"Test {test_file} Compilation Failed")
+                        test_detail_lines.append(compile_errors)
+                        summary_lines.append(f"Test {test_file}: Compilation error")
                         continue
 
 
@@ -118,11 +119,12 @@ class JUnitEval():
                         successful_tests += 1
                         match = self.success_regex.search(output)
                         if match:
-                            n = int(match.group(1))
-                            report_lines.append(f"Test {test_file}: {n}/{n} (100%)")
+                            ok = int(match.group(1))
+                            total_score += ok
+                            summary_lines.append(f"Test {test_file}: {ok}/{ok} (100%)")
                         else:
-                            report_lines.append(f"Test {test_file}: 100%")
-                        test_report_lines.append("OK")
+                            summary_lines.append(f"Test {test_file}: 100%")
+                        test_detail_lines.append("OK")
                     else:
                         # Collect failed test results (number of failed, error messages)
                         match = self.failure_regex.search(output)
@@ -130,35 +132,52 @@ class JUnitEval():
                             run = int(match.group(1))
                             nok = int(match.group(2))
                             ok = run - nok
-                            report_lines.append(f"Test {test_file}: {ok}/{run} ({ok/(run)*100:.1f}%)")
+                            total_score += ok
+                            summary_lines.append(f"Test {test_file}: {ok}/{run} ({ok/(run)*100:.1f}%)")
                         else:
-                            report_lines.append(f"Test {test_file}: ?/?")
+                            summary_lines.append(f"Test {test_file}: ?/?")
 
-                        test_report_lines.append("FAILED. Errors:\n")
-                        test_report_lines.append(output)
+                        test_detail_lines.append("FAILED. Errors:\n")
+                        test_detail_lines.append(output)
 
 
                 # Record the results
-                report_lines.insert(1, "---- Overall results ----\n")
-                report_lines.insert(2, f"Number of Successful Tests: {successful_tests}/{len(test_files)}\n")
-                report_lines.extend(test_report_lines)
+                report_lines = []
+                if self.output_cfg.SUMMARY:
+                    report_lines.append(f"Number of Successful Tests: {successful_tests}/{len(test_files)}\n")
+                    report_lines.extend(summary_lines)
+                if self.output_cfg.DETAILED:
+                    report_lines.extend(test_detail_lines)
 
             # Write the report to a file
             report_path = osp.join(self.output_dir, f"{submission_base}.txt")
+            report_output = "\n".join(report_lines)
             with open(report_path, 'w') as report_file:
-                report_file.write("\n".join(report_lines))
+                report_file.write(report_output)
+
+            report_output_html = report_output.replace('\n', '<br>')
+            email = submission_name.split('=')[1]
+            row = [email, total_score, report_output_html]
+            return row
+
 
     def process_all_submissions(self, num_workers=1):
         # Ensure output directory exists
         os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
 
         all_submissions = [f for f in os.listdir(self.submissions_dir) if f.endswith('.java')]
-        if num_workers > 1:
-            pool = Pool(num_workers)
-            list(tqdm(pool.imap(self.process_submission, [osp.join(self.submissions_dir, f) for f in all_submissions]), total=len(all_submissions), desc="Processing submissions"))
-        else:
-            for submission_file in tqdm(all_submissions, desc="Processing submissions"):
-                self.process_submission(osp.join(self.submissions_dir, submission_file))
+        # Write the results to a CSV file
+        with open(osp.join(self.output_dir, 'results.csv'), 'w') as results_file:
+            if num_workers > 1:
+                pool = Pool(num_workers)
+                for row in tqdm(pool.imap(self.process_submission, [osp.join(self.submissions_dir, f) for f in all_submissions]), total=len(all_submissions), desc="Processing submissions"):
+                    results_file.write(f"{row[0]}\t{row[1]}\t{row[2]}\n")
+            else:
+                for submission_file in tqdm(all_submissions, desc="Processing submissions"):
+                    row = self.process_submission(osp.join(self.submissions_dir, submission_file))
+                    results_file.write(f"{row[0]}\t{row[1]}\t{row[2]}\n")
+
+
 
 def main():
     parser = argparse.ArgumentParser(description="Run Java unit tests on submissions.")

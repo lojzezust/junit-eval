@@ -14,4 +14,9 @@ _C.DEFAULT_JAVA_CP = "."
 _C.SUCCESS_REGEX = r"OK \((\d+) tests\)"
 _C.FAILURE_REGEX = r"Tests run: (\d+),  Failures: (\d+)"
 
+# Output configuration
+_C.OUTPUT = CN()
+_C.OUTPUT.SUMMARY = True # Summarized test results
+_C.OUTPUT.DETAILED = True # Detailed test results (with errors)
+
 cfg = _C

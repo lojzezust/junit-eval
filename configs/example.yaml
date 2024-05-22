@@ -1,6 +1,6 @@
 
 # Directory where the submissions are stored
-SUBMISSIONS_DIR: "submissions"
+SUBMISSIONS_DIR: "DN09/submissions"
 
 # Name of the main class
 CLASS_NAME: "DN09"
@@ -23,3 +23,9 @@ JAVA_COMPILE_CMD: "path/to/jdk/bin/javac"
 # Command used for running Java files
 JAVA_RUN_CMD: "path/to/jdk/bin/java"
 
+# Output settings
+OUTPUT:
+  # Print the summary of the test results
+  SUMMARY: True
+  # Print the detailed test results including error messages
+  DETAILED: True
