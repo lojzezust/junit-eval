@@ -9,6 +9,9 @@ from tqdm.auto import tqdm
 import re
 
 from .config import cfg
+from multiprocessing import Pool
+
+NUM_WORKERS = 4
 
 class JUnitEval():
     def __init__(self, submissions_dir, class_name, unit_tests_dir, output_dir, libs_dir,
@@ -145,17 +148,22 @@ class JUnitEval():
             with open(report_path, 'w') as report_file:
                 report_file.write("\n".join(report_lines))
 
-    def process_all_submissions(self):
+    def process_all_submissions(self, num_workers=1):
         # Ensure output directory exists
         os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
 
         all_submissions = [f for f in os.listdir(self.submissions_dir) if f.endswith('.java')]
-        for submission_file in tqdm(all_submissions, "Processing submissions"):
-            self.process_submission(osp.join(self.submissions_dir, submission_file))
+        if num_workers > 1:
+            pool = Pool(num_workers)
+            list(tqdm(pool.imap(self.process_submission, [osp.join(self.submissions_dir, f) for f in all_submissions]), total=len(all_submissions), desc="Processing submissions"))
+        else:
+            for submission_file in tqdm(all_submissions, desc="Processing submissions"):
+                self.process_submission(osp.join(self.submissions_dir, submission_file))
 
 def main():
     parser = argparse.ArgumentParser(description="Run Java unit tests on submissions.")
     parser.add_argument('config', type=str, help='Path to the configuration file. See `configs/example.yaml` for an example.')
+    parser.add_argument('--num-workers', type=int, default=NUM_WORKERS, help=f'Number of concurrent workers. Default: {NUM_WORKERS}.')
 
     args = parser.parse_args()
 
@@ -165,7 +173,7 @@ def main():
     print(cfg)
 
     evaluator = JUnitEval.from_config(cfg)
-    evaluator.process_all_submissions()
+    evaluator.process_all_submissions(num_workers=args.num_workers)
 
 if __name__ == "__main__":
     main()
