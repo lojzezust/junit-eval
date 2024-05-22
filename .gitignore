@@ -1,0 +1,10 @@
+# Workspace
+.vscode/
+.DS_Store
+
+# Python
+*.pyc
+__pycache__/
+
+
+data/

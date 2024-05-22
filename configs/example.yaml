@@ -1,0 +1,25 @@
+
+# Directory where the submissions are stored
+SUBMISSIONS_DIR: "submissions"
+
+# Name of the main class
+CLASS_NAME: "DN09"
+
+# Directory where the unit tests are stored
+UNIT_TESTS_DIR: "DN09/tests"
+
+# Directory where the resources are stored
+RESOURCES_DIR: "DN09/res"
+
+# Directory where the output of the unit tests will be stored
+OUTPUT_DIR: "DN09/output"
+
+# Directory where the libraries (*.jar) are stored
+LIBS_DIR: "DN09/lib"
+
+# Command used for compiling Java files
+JAVA_COMPILE_CMD: "path/to/jdk/bin/javac"
+
+# Command used for running Java files
+JAVA_RUN_CMD: "path/to/jdk/bin/java"
+
