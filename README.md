@@ -1,4 +1,14 @@
-A simple JUnit evaluation tool for batch processing of multiple implementations. Suitable for automated grading of assignments.
+
+<table align="center">
+    <tr>
+        <td align="center"><img src="images/icon.png"/></td>
+        <td align="left"><b>junit-eval</b>: A simple JUnit evaluation tool for batch processing of multiple implementations. Suitable for automated grading of assignments.</td>
+    </tr>
+</table>
+
+
+
+
 
 
 
