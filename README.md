@@ -1,6 +1,5 @@
 
-
-<img valign="middle" src="images/icon.png"/> **junit-eval**: A simple JUnit evaluation tool for batch processing of multiple implementations. Suitable for automated grading of assignments.
+<img align="left" src="images/icon.png"/> <br><br>**junit-eval**: A simple JUnit evaluation tool for batch processing of multiple implementations. Suitable for automated grading of assignments.<br><br>
 
 
 ## Features
