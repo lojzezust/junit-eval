@@ -1,8 +1,8 @@
 
-<table align="center" border="0">
+<table align="center" style="border: none; border-collapse: collapse;">
     <tr>
-        <td align="center"><img src="images/icon.png"/></td>
-        <td align="left"><b>junit-eval</b>: A simple JUnit evaluation tool for batch processing of multiple implementations. Suitable for automated grading of assignments.</td>
+        <td align="center" style="border: none;"><img src="images/icon.png"/></td>
+        <td align="left" style="border: none;"><b>junit-eval</b>: A simple JUnit evaluation tool for batch processing of multiple implementations. Suitable for automated grading of assignments.</td>
     </tr>
 </table>
 
