@@ -1,16 +1,10 @@
 
-<table align="center">
+<table align="center" border="0">
     <tr>
         <td align="center"><img src="images/icon.png"/></td>
         <td align="left"><b>junit-eval</b>: A simple JUnit evaluation tool for batch processing of multiple implementations. Suitable for automated grading of assignments.</td>
     </tr>
 </table>
-
-
-
-
-
-
 
 ## Features
 
@@ -124,4 +118,4 @@ This is a quickly implemented project with a few caveats and limitations:
 - No security features are currently implemented.
 - Currently limited to single-file programs/submissions.
 - Some features are hard-coded to our specific use-case. Feel free to adapt the code if you need.
-    - This includes the expectation that submissions are a named a specific way exported by Moodle (`name=email=*.java`). The script extracts the email field which is stored in the final CSV report.
+    - This includes the expectation that submissions are a named a specific way as exported by Moodle (`name=email=*.java`). The script extracts the email field which is stored in the final CSV report.
