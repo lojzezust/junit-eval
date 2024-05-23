@@ -29,3 +29,12 @@ OUTPUT:
   SUMMARY: True
   # Print the detailed test results including error messages
   DETAILED: True
+
+
+GPT_GRADER:
+  ENABLED: True
+  API_KEY: "<your-api-key>"
+  MODEL: "gpt-4o"
+  MAX_TOKENS: 2000
+  TEMPERATURE: 0.5
+  INSTRUCTION_FILE: "path/to/instructions.txt"

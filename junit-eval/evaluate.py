@@ -7,11 +7,11 @@ import tempfile
 import argparse
 from tqdm.auto import tqdm
 import re
-
-from .config import cfg
 from multiprocessing import Pool
 
-NUM_WORKERS = 4
+from .config import cfg
+
+NUM_WORKERS = 1
 
 class JUnitEval():
     def __init__(self, submissions_dir, class_name, unit_tests_dir, output_dir, libs_dir,
@@ -20,7 +20,8 @@ class JUnitEval():
                  java_run_cmd=cfg.JAVA_RUN_CMD,
                  success_regex=cfg.SUCCESS_REGEX,
                  failure_regex=cfg.FAILURE_REGEX,
-                 output_cfg=cfg.OUTPUT):
+                 output_cfg=cfg.OUTPUT,
+                 gpt_grader=None):
         self.submissions_dir = submissions_dir
         self.class_name = class_name
         self.unit_tests_dir = unit_tests_dir
@@ -32,9 +33,16 @@ class JUnitEval():
         self.success_regex = re.compile(success_regex)
         self.failure_regex = re.compile(failure_regex)
         self.output_cfg = output_cfg
+        self.gpt_grader = gpt_grader
 
     @classmethod
     def from_config(cls, cfg):
+        if not cfg.GPT_GRADER.ENABLED:
+            gpt_grader = None
+        else:
+            from .gpt_grader import GPTGrader
+            gpt_grader = GPTGrader.from_config(cfg)
+
         return cls(
             submissions_dir=cfg.SUBMISSIONS_DIR,
             class_name=cfg.CLASS_NAME,
@@ -46,7 +54,8 @@ class JUnitEval():
             java_run_cmd=cfg.JAVA_RUN_CMD,
             success_regex=cfg.SUCCESS_REGEX,
             failure_regex=cfg.FAILURE_REGEX,
-            output_cfg=cfg.OUTPUT
+            output_cfg=cfg.OUTPUT,
+            gpt_grader=gpt_grader
         )
 
     def compile_java_file(self, file_path, classpath):
@@ -152,6 +161,10 @@ class JUnitEval():
             # Write the report to a file
             report_path = osp.join(self.output_dir, f"{submission_base}.txt")
             report_output = "\n".join(report_lines)
+
+            if self.gpt_grader is not None:
+                report_output += "\n\n---- Submission analysis ----\n\n" + self.gpt_grader.grade(submission_file)
+
             with open(report_path, 'w') as report_file:
                 report_file.write(report_output)
 
