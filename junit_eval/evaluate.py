@@ -96,8 +96,11 @@ class JUnitEval():
             compile_success, compile_errors = self.compile_java_file(temp_submission_path, class_path)
 
             summary_lines = []
+            test_detail_lines = []
+            total_score = 0
+            successful_tests = 0
             if not compile_success:
-                summary_lines.append("Submission Compilation Failed")
+                summary_lines.append("Submission Compilation Failed\n")
                 summary_lines.append(compile_errors)
             else:
                 # Copy all unit test files to the temporary directory
@@ -106,9 +109,6 @@ class JUnitEval():
 
                 # Compile unit tests
                 test_files = sorted(f for f in os.listdir(self.unit_tests_dir) if 'Test' in f and f.endswith('.java')) # TODO: better naming scheme?
-                test_detail_lines = []
-                successful_tests = 0
-                total_score = 0
                 for test_file in test_files:
                     test_path = osp.join(temp_dir, test_file)
                     success, compile_errors = self.compile_java_file(test_path, class_path)
@@ -150,10 +150,11 @@ class JUnitEval():
                         test_detail_lines.append(output)
 
 
-            # Record the results
+                # Record the results
+                summary_lines.insert(0, f"Number of Successful Tests: {successful_tests}/{len(test_files)}\n")
+
             report_lines = []
             if self.output_cfg.SUMMARY:
-                report_lines.append(f"Number of Successful Tests: {successful_tests}/{len(test_files)}\n")
                 report_lines.extend(summary_lines)
             if self.output_cfg.DETAILED:
                 report_lines.extend(test_detail_lines)
