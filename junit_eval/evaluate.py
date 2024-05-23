@@ -150,13 +150,13 @@ class JUnitEval():
                         test_detail_lines.append(output)
 
 
-                # Record the results
-                report_lines = []
-                if self.output_cfg.SUMMARY:
-                    report_lines.append(f"Number of Successful Tests: {successful_tests}/{len(test_files)}\n")
-                    report_lines.extend(summary_lines)
-                if self.output_cfg.DETAILED:
-                    report_lines.extend(test_detail_lines)
+            # Record the results
+            report_lines = []
+            if self.output_cfg.SUMMARY:
+                report_lines.append(f"Number of Successful Tests: {successful_tests}/{len(test_files)}\n")
+                report_lines.extend(summary_lines)
+            if self.output_cfg.DETAILED:
+                report_lines.extend(test_detail_lines)
 
             # Write the report to a file
             report_path = osp.join(self.output_dir, f"{submission_base}.txt")
