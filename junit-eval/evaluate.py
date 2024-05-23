@@ -194,7 +194,7 @@ class JUnitEval():
 
 def main():
     parser = argparse.ArgumentParser(description="Run Java unit tests on submissions.")
-    parser.add_argument('config', type=str, help='Path to the configuration file. See `configs/example.yaml` for an example.')
+    parser.add_argument('config', type=str, help='Path to the configuration file. See `https://github.com/lojzezust/junit-eval/blob/main/configs/example.yaml` for an example configuration.')
     parser.add_argument('--num-workers', type=int, default=NUM_WORKERS, help=f'Number of concurrent workers. Default: {NUM_WORKERS}.')
 
     args = parser.parse_args()
