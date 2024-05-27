@@ -12,7 +12,7 @@ class GPTGrader():
         with open(instruction_file, 'r') as f:
             self.instructions = f.read()
 
-        self.client = OpenAI(api_key=self.api_key)
+        self.client = None
 
     def from_config(cfg):
         return GPTGrader(
@@ -25,6 +25,10 @@ class GPTGrader():
         )
 
     def grade(self, assignment_file):
+        # Lazy load (to support multiprocessing)
+        if self.client is None:
+            self.client = OpenAI(api_key=self.api_key)
+
         with open(assignment_file, 'r') as f:
             assignment = f.read()
 
