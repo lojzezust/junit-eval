@@ -187,7 +187,7 @@ class JUnitEval():
         # Ensure output directory exists
         os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
 
-        all_submissions = [f for f in os.listdir(self.submissions_dir) if f.endswith('.java')]
+        all_submissions = sorted(f for f in os.listdir(self.submissions_dir) if f.endswith('.java'))
         # Write the results to a CSV file
         with open(osp.join(self.output_dir, 'results.csv'), 'w') as results_file:
             if num_workers > 1:
