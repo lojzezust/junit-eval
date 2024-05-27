@@ -164,7 +164,15 @@ class JUnitEval():
             report_output = "\n".join(report_lines)
 
             if self.gpt_grader is not None:
-                report_output += "\n\n---- Submission analysis ----\n\n" + self.gpt_grader.grade(submission_file)
+                gpt_report_path = osp.join(self.output_dir, f"{submission_base}_gpt.txt")
+                if osp.exists(gpt_report_path):
+                    gpt_output = open(gpt_report_path, 'r').read()
+                    tqdm.write(f"Using cached GPT report for {submission_name}")
+                else:
+                    gpt_output = self.gpt_grader.grade(submission_file)
+                    with open(gpt_report_path, 'w') as report_file:
+                        report_file.write(gpt_output)
+                report_output += "\n\n---- Submission analysis ----\n\n" + gpt_output
 
             with open(report_path, 'w') as report_file:
                 report_file.write(report_output)
