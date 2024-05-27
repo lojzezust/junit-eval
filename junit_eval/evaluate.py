@@ -170,8 +170,9 @@ class JUnitEval():
                     tqdm.write(f"Using cached GPT report for {submission_name}")
                 else:
                     gpt_output = self.gpt_grader.grade(submission_file)
-                    with open(gpt_report_path, 'w') as report_file:
-                        report_file.write(gpt_output)
+                    if gpt_output is not None:
+                        with open(gpt_report_path, 'w') as report_file:
+                            report_file.write(gpt_output)
                 report_output += "\n\n---- Submission analysis ----\n\n" + gpt_output
 
             with open(report_path, 'w') as report_file:

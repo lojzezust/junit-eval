@@ -1,4 +1,5 @@
-from openai import OpenAI
+import openai
+from tqdm.auto import tqdm
 
 class GPTGrader():
     def __init__(self, api_key, system_prompt, instruction_file, max_tokens=100, temperature=0.5, engine="gpt-3.5-turbo"):
@@ -27,21 +28,34 @@ class GPTGrader():
     def grade(self, assignment_file):
         # Lazy load (to support multiprocessing)
         if self.client is None:
-            self.client = OpenAI(api_key=self.api_key)
+            self.client = openai.OpenAI(api_key=self.api_key)
 
         with open(assignment_file, 'r') as f:
             assignment = f.read()
 
         prompt = f"{self.instructions}\n\n{assignment}"
 
-        response = self.client.chat.completions.create(
-            model=self.engine,
-            messages=[
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=self.max_tokens,
-            temperature=self.temperature
-        )
+        try:
+            response = self.client.chat.completions.create(
+                model=self.engine,
+                messages=[
+                    {"role": "system", "content": self.system_prompt},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=self.max_tokens,
+                temperature=self.temperature
+            )
 
-        return response.choices[0].message.content
+            return response.choices[0].message.content
+
+        except openai.APIConnectionError as e:
+            print("The server could not be reached")
+            print(e.__cause__)  # an underlying Exception, likely raised within httpx.
+        except openai.RateLimitError as e:
+            print("A 429 status code was received; we should back off a bit.")
+        except openai.APIStatusError as e:
+            print("Another non-200-range status code was received")
+            print(e.status_code)
+            print(e.response)
+
+        return None
