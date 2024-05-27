@@ -173,6 +173,8 @@ class JUnitEval():
                     if gpt_output is not None:
                         with open(gpt_report_path, 'w') as report_file:
                             report_file.write(gpt_output)
+                    else:
+                        gpt_output = "FAILED"
                 report_output += "\n\n---- Submission analysis ----\n\n" + gpt_output
 
             with open(report_path, 'w') as report_file:
