@@ -20,8 +20,7 @@ class JUnitEval():
                  java_run_cmd=cfg.JAVA_RUN_CMD,
                  success_regex=cfg.SUCCESS_REGEX,
                  failure_regex=cfg.FAILURE_REGEX,
-                 output_cfg=cfg.OUTPUT,
-                 gpt_grader=None):
+                 output_cfg=cfg.OUTPUT):
         self.submissions_dir = submissions_dir
         self.class_name = class_name
         self.unit_tests_dir = unit_tests_dir
@@ -33,15 +32,9 @@ class JUnitEval():
         self.success_regex = re.compile(success_regex)
         self.failure_regex = re.compile(failure_regex)
         self.output_cfg = output_cfg
-        self.gpt_grader = gpt_grader
 
     @classmethod
     def from_config(cls, cfg):
-        if not cfg.GPT_GRADER.ENABLED:
-            gpt_grader = None
-        else:
-            from .gpt_grader import GPTGrader
-            gpt_grader = GPTGrader.from_config(cfg)
 
         return cls(
             submissions_dir=cfg.SUBMISSIONS_DIR,
@@ -54,8 +47,7 @@ class JUnitEval():
             java_run_cmd=cfg.JAVA_RUN_CMD,
             success_regex=cfg.SUCCESS_REGEX,
             failure_regex=cfg.FAILURE_REGEX,
-            output_cfg=cfg.OUTPUT,
-            gpt_grader=gpt_grader
+            output_cfg=cfg.OUTPUT
         )
 
     def compile_java_file(self, file_path, classpath):
@@ -78,7 +70,6 @@ class JUnitEval():
 
         # Collect all JAR files in the libs directory
         libs = [str(p.absolute()) for p in Path(self.libs_dir).glob('*.jar')]
-
 
         # Create a temporary directory for this submission
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -163,20 +154,6 @@ class JUnitEval():
             report_path = osp.join(self.output_dir, f"{submission_base}.txt")
             report_output = "\n".join(report_lines)
 
-            if self.gpt_grader is not None:
-                gpt_report_path = osp.join(self.output_dir, f"{submission_base}_gpt.txt")
-                if osp.exists(gpt_report_path):
-                    gpt_output = open(gpt_report_path, 'r').read()
-                    tqdm.write(f"Using cached GPT report for {submission_name}")
-                else:
-                    gpt_output = self.gpt_grader.grade(submission_file)
-                    if gpt_output is not None:
-                        with open(gpt_report_path, 'w') as report_file:
-                            report_file.write(gpt_output)
-                    else:
-                        gpt_output = "FAILED"
-                report_output += "\n\n---- Submission analysis ----\n\n" + gpt_output
-
             with open(report_path, 'w') as report_file:
                 report_file.write(report_output)
 
@@ -188,7 +165,7 @@ class JUnitEval():
 
     def process_all_submissions(self, num_workers=1):
         # Ensure output directory exists
-        os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
+        os.makedirs(self.output_dir, exist_ok=True)
 
         all_submissions = sorted(f for f in os.listdir(self.submissions_dir) if f.endswith('.java'))
         # Write the results to a CSV file
