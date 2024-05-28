@@ -180,14 +180,16 @@ class JUnitEval():
                     results_file.write(f"{row[0]}\t{row[1]}\t{row[2]}\n")
 
 
+def get_parser(parser=None):
+    if parser is None:
+        parser = argparse.ArgumentParser(description="Run Java unit tests on submissions.")
 
-def main():
-    parser = argparse.ArgumentParser(description="Run Java unit tests on submissions.")
     parser.add_argument('config', type=str, help='Path to the configuration file. See `https://github.com/lojzezust/junit-eval/blob/main/configs/example.yaml` for an example configuration.')
     parser.add_argument('--num-workers', type=int, default=NUM_WORKERS, help=f'Number of concurrent workers. Default: {NUM_WORKERS}.')
 
-    args = parser.parse_args()
+    return parser
 
+def main(args):
     cfg.merge_from_file(args.config)
     cfg.freeze()
 
@@ -197,4 +199,6 @@ def main():
     evaluator.process_all_submissions(num_workers=args.num_workers)
 
 if __name__ == "__main__":
-    main()
+    parser = get_parser()
+    args = parser.parse_args()
+    main(args)

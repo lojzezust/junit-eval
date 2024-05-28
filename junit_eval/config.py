@@ -28,6 +28,6 @@ _C.GPT_GRADER.MAX_TOKENS = 1000
 _C.GPT_GRADER.TEMPERATURE = 0.5
 _C.GPT_GRADER.INSTRUCTION_FILE = "instructions.md"
 _C.GPT_GRADER.SYSTEM_PROMPT = "You are a helpful grading assistant. You provide short and concise feedback on the submission based on the provided criteria."
-
+_C.GPT_GRADER.MAX_RETRY_TIME = 30*60 # 30 minutes
 
 cfg = _C

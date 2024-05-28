@@ -7,11 +7,12 @@ setup(
     install_requires=[
         'yacs',
         'tqdm',
-        'openai'
+        'openai',
+        'backoff'
     ],
     entry_points={
         'console_scripts': [
-            'junit-eval=junit_eval.evaluate:main',
+            'junit-eval=junit_eval.main:main'
         ],
     },
     url='https://github.com/lojzezust/junit-eval',  # Replace with your repo URL
