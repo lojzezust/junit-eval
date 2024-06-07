@@ -55,7 +55,7 @@ pip install git+https://github.com/lojzezust/junit-eval.git
 **Step 3**: Run the evaluator
 
 ```bash
-junit-eval config.yaml
+junit-eval junit config.yaml
 ```
 > [!TIP]
 > Use the `--num-workers` argument to enable parallel processing.
@@ -84,8 +84,7 @@ For each of the submissions in the submission directory the following steps are 
     1. Compile the test class against the assignment. In case of compilation failure the test counts as failed and compilation error is reported.  
     **Note**: Not implemented methods/classes will cause compilation errors. It is thus recommended to separate test files into unit-sized chunks that test a single aspect of the assignment.
     2. Run the test cases and report the number of passed tests and the encountered errors.
-    3. (Optional) Analyze the source code against a grading criteria using LLMs (GPT API) and add the results to the report
-    4. Output the report for the assignment.
+    3. Output the report for the assignment.
 
 
 ## GPT Analysis of Submissions
@@ -103,7 +102,11 @@ Ex. 1:
 ...
 
 ```
-4. Run junit-eval as normal. GPT analysis results will be appended to the end of the report.
+4. Run `junit-eval gpt` command. GPT analysis results will be stored into the output directory. Since OpenAI imposes [per-minute rate limits](https://platform.openai.com/docs/guides/rate-limits/error-mitigation), we keep retrying individual requests with exponential backoff for up to `GPT_GRADER.MAX_RETRY_TIME` seconds. Due to the rate limits the GPT analysis may take some time.
+
+```bash
+junit-eval gpt config.yaml
+```
 
 > [!WARNING]
 > Depending on the length of instructions and submissions, and the selected model, token use may be large. It is always recommended to test on a small sample, to preview the expected costs and quality of the responses.

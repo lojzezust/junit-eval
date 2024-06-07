@@ -38,3 +38,5 @@ GPT_GRADER:
   MAX_TOKENS: 2000 # Limits response length, might need to increase in case of complex grading criteria
   TEMPERATURE: 0.5 # Controls randomness of the response, lower values are more deterministic
   INSTRUCTION_FILE: "path/to/instructions.txt"
+  MAX_RETRY_TIME: 30 * 60 # 30 minutes
+
