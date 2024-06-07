@@ -42,21 +42,17 @@ class GPTGrader():
 
         prompt = f"{self.instructions}\n\n{assignment}"
 
-        try:
-            response = self.client.chat.completions.create(
-                model=self.engine,
-                messages=[
-                    {"role": "system", "content": self.system_prompt},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=self.max_tokens,
-                temperature=self.temperature
-            )
+        response = self.client.chat.completions.create(
+            model=self.engine,
+            messages=[
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=self.max_tokens,
+            temperature=self.temperature
+        )
 
-            return response.choices[0].message.content
-
-
-        return None
+        return response.choices[0].message.content
 
 def gpt_grade_submissions(grader, submissions_dir, output_dir, overwrite, max_retry_time=30*60):
     os.makedirs(output_dir, exist_ok=True)
