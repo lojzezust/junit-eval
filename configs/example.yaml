@@ -32,7 +32,6 @@ OUTPUT:
 
 
 GPT_GRADER:
-  ENABLED: False
   API_KEY: "<your-api-key>"
   MODEL: "gpt-4o" # Might try "gpt-3.5-turbo" for faster and cheaper, although less accurate responses
   MAX_TOKENS: 2000 # Limits response length, might need to increase in case of complex grading criteria

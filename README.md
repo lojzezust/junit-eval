@@ -89,10 +89,9 @@ For each of the submissions in the submission directory the following steps are 
 
 ## GPT Analysis of Submissions
 
-To use this feature you need an OpenAI API key. 
-1. Enable the feature by setting `GPT_GRADER.ENABLED` field to `True`.
-2. Enter your API key in the `GPT_GRADER.API_KEY` field.
-3. Prepare instructions for grading in a file and link to it in the `GPT_GRADER.INSTRUCTION_FILE` field. The instructions might look something like this.
+To use this feature you need an OpenAI API key.
+1. Enter your API key in the `GPT_GRADER.API_KEY` field.
+2. Prepare instructions for grading in a file and link to it in the `GPT_GRADER.INSTRUCTION_FILE` field. The instructions might look something like this.
 ```text
 Score the provided JAVA program using the following criteria. You may use half points. Keep the comments short.
 
@@ -102,7 +101,7 @@ Ex. 1:
 ...
 
 ```
-4. Run `junit-eval gpt` command. GPT analysis results will be stored into the output directory. Since OpenAI imposes [per-minute rate limits](https://platform.openai.com/docs/guides/rate-limits/error-mitigation), we keep retrying individual requests with exponential backoff for up to `GPT_GRADER.MAX_RETRY_TIME` seconds. Due to the rate limits the GPT analysis may take some time.
+3. Run `junit-eval gpt` command. GPT analysis results will be stored into the output directory. Since OpenAI imposes [per-minute rate limits](https://platform.openai.com/docs/guides/rate-limits/error-mitigation), we keep retrying individual requests with exponential backoff for up to `GPT_GRADER.MAX_RETRY_TIME` seconds. Due to the rate limits the GPT analysis may take some time.
 
 ```bash
 junit-eval gpt config.yaml
@@ -110,6 +109,16 @@ junit-eval gpt config.yaml
 
 > [!WARNING]
 > Depending on the length of instructions and submissions, and the selected model, token use may be large. It is always recommended to test on a small sample, to preview the expected costs and quality of the responses.
+
+## Merging results
+
+We also provide an utility for merging comments from different sources (CSV files and per-submission unit/GPT comments). You may use the following command to append comments from unit tests and GPT analysis to base CSV results:
+
+```bash
+junit-eval merge config.yaml --output-file output_results.csv --csv-base base_results.csv
+```
+
+The command will look through the output directory defined in the config file and add the comments from found result files (Junit and GPT) to the base CSV file and save it into a new output file.
 
 ## Limitations
 

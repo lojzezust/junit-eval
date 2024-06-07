@@ -56,7 +56,7 @@ def main(args):
     # Save to CSV
     output_file = args.output_file if args.output_file is not None else osp.join(cfg.OUTPUT_DIR, 'results.csv')
     with open(output_file, 'w') as results_file:
-        results_file.write("Email\tOcena\tKomentar\n")
+        results_file.write("ID\tOcena\tKomentar\n")
         for email, data in entries.items():
             junit = data.get('junit', '')
             gpt = data.get('gpt', '')

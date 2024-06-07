@@ -21,7 +21,6 @@ _C.OUTPUT.DETAILED = True # Detailed test results (with errors)
 
 # GPT grader configuration
 _C.GPT_GRADER = CN()
-_C.GPT_GRADER.ENABLED = False
 _C.GPT_GRADER.API_KEY = None
 _C.GPT_GRADER.MODEL = "gpt-3.5-turbo"
 _C.GPT_GRADER.MAX_TOKENS = 1000
